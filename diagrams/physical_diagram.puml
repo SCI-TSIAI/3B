@@ -1,0 +1,111 @@
+@startuml
+
+entity user {
+  * id
+  --
+  * username
+  * password
+  * created_at
+  * last_login
+}
+
+entity user_contact_data {
+  * id
+  --
+  * user_id
+  * email
+  * phone_number
+  * street_name
+  * street_number
+  * flat_number
+  * city
+  * province
+  * postal_code
+  * country
+}
+
+entity product {
+  * id
+  --
+  * name
+  * catalog_number
+  * price
+  * quantity
+  * category
+  * created_at
+}
+
+entity product_category{
+  * id
+  --
+  * name
+  * parent_id
+}
+
+entity shop_contact_data{
+  *id
+  --
+  * active
+  * email
+  * phone_number
+  * street_name
+  * street_number
+  * flat_number
+  * city
+  * province
+  * postal_code
+  * created_at
+}
+
+entity system_settings{
+  * id
+  --
+  * key
+  * value
+}
+
+entity shopping_cart {
+  * id
+  --
+  * user_id
+}
+
+entity shopping_cart_product{
+  * id
+  --
+  product_id
+  shopping_cart_id
+  quantity
+}
+
+entity transaction{
+  * id
+  --
+  * shopping_cart
+  * payment_type
+  * payment_reference
+  * transaction_details
+  * created_at
+}
+
+entity transaction_details {
+  * id
+  --
+  * first_name
+  * last_name
+  * email
+  * credit_card_number
+  * finalized_at
+  * created_at
+}
+
+user ||..|| shopping_cart
+product ||..|{ product_category
+product_category ||..|{ product_category
+shopping_cart ||..|| transaction
+transaction ||..|| transaction_details
+user ||..|{ user_contact_data
+shopping_cart ||..|{ shopping_cart_product
+product ||..|{ shopping_cart_product
+
+@enduml
