@@ -5,8 +5,8 @@ entity user {
   --
   * username
   * password
-  * created_at
   * last_login
+  * created_at
 }
 
 entity user_contact_data {
@@ -31,30 +31,30 @@ entity product {
   * catalog_number
   * price
   * quantity
-  * category
+  * category_id
   * created_at
 }
 
 entity product_category{
-  * id
+  * id: serial
   --
-  * name
-  * parent_id
+  * <FK>parent_id: unsigned bigint
+  * name: text(32)
 }
 
 entity shop_contact_data{
-  *id
+  *id: serial
   --
-  * active
-  * email
-  * phone_number
-  * street_name
-  * street_number
-  * flat_number
-  * city
-  * province
-  * postal_code
-  * created_at
+  * active: bool
+  * email: text(64)
+  * phone_number: text(12)
+  * street_name: text
+  * street_number: smallint
+  * flat_number: smallint
+  * city: text
+  * province: text
+  * postal_code: text(10)
+  * created_at: timestamp
 }
 
 entity system_settings{
@@ -76,15 +76,16 @@ entity shopping_cart_product{
   product_id
   shopping_cart_id
   quantity
+  created_at
 }
 
 entity transaction{
   * id
   --
-  * shopping_cart
+  * shopping_cart_id
+  * transaction_details_id
   * payment_type
   * payment_reference
-  * transaction_details
   * created_at
 }
 
