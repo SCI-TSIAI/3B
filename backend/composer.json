@@ -1,0 +1,17 @@
+{
+    "name": "igormaculewicz/backend",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "App/"
+        }
+    },
+    "authors": [
+        {
+            "name": "igor.maculewicz",
+            "email": "igor.maculewicz@assecods.pl"
+        }
+    ],
+    "require": {
+    }
+}
