@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS shop.user
     id            SERIAL PRIMARY KEY,
     username      TEXT(32)  NOT NULL,
     password_hash TEXT      NOT NULL,
-    last_login    TIMESTAMP NOT NULL,
+    last_login    TIMESTAMP,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

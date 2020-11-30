@@ -1,7 +1,9 @@
 <?php namespace App\User\Entity;
 
 
-class UserEntity {
+use App\Database\Entity\Entity;
+
+class UserEntity extends Entity {
 
     private $id;
     private $username;

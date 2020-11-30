@@ -1,6 +1,8 @@
 <?php namespace App;
 
 
+use App\Database\Repository\Repository;
+use App\User\Entity\UserEntity;
 use App\User\Repository\UserRepository;
 
 class Application {
@@ -9,8 +11,14 @@ class Application {
     public static function run() {
         $userRepository = new UserRepository();
 
-        $result = $userRepository->getUserById(1);
+//        $result = $userRepository->getById(1);
 
-        var_dump($result->getCreatedAt());
+
+        $entity = new UserEntity();
+        $entity->setUsername("dsadsadsa");
+        $entity->setPasswordHash("dsadsadsadsa");
+
+
+        $userRepository->save($entity);
     }
 }

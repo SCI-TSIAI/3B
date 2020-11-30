@@ -2,35 +2,24 @@
 
 
 use App\Database\Connector;
+use App\Database\Repository\Repository;
 use App\User\Entity\UserEntity;
 use PDO;
 
-class UserRepository {
-
-    private $databaseConnection;
+class UserRepository extends Repository {
 
     /**
      * UserRepository constructor.
      */
     public function __construct() {
-        $this->databaseConnection = Connector::getInstance();
+        parent::__construct();
     }
 
-    /**
-     * @param $id
-     * @return UserEntity
-     */
-    public function getUserById($id) {
-
-        $query = $this->databaseConnection->prepare("Select * from user where id=:id");
-
-        $query->execute(array(":id" => $id));
-        $query->setFetchMode(PDO::FETCH_CLASS, $this->getEntityName());
-
-        return $query->fetch();
-    }
-
-    private function getEntityName() {
+    public function getEntityName() {
         return "App\User\Entity\UserEntity";
+    }
+
+    protected function getTableName() {
+        return "user";
     }
 }
