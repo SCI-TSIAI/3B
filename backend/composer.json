@@ -13,6 +13,9 @@
         }
     ],
     "require": {
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "bramus/router": "~1.5",
+        "ext-json": "*",
+        "zeptech/annotations": "^1.1"
     }
 }

@@ -30,4 +30,11 @@ class ReflectionUtils {
 
         return $result;
     }
+
+
+    public static function getFullMethodIdentifier(\ReflectionMethod $methodReflector) {
+        $declaringClass = $methodReflector->getDeclaringClass();
+        return "\\" . $declaringClass->getNamespaceName() . "\\" . $declaringClass->getShortName() . "@" . $methodReflector->getName();
+    }
+
 }
