@@ -4,10 +4,9 @@
 namespace App\Database\Repository;
 
 
-use App\Database\Connector;
+use App\Database\DatabaseConnection;
 use App\Database\Entity\Entity;
 use App\Helpers\ReflectionUtils;
-use App\User\Entity\UserEntity;
 use PDO;
 
 abstract class Repository {
@@ -15,14 +14,8 @@ abstract class Repository {
     private $databaseConnection;
 
     public function __construct() {
-        $this->databaseConnection = Connector::getInstance();
-    }
-
-    protected function prepare($statement) {
-        $query = $this->databaseConnection->prepare($statement);
-        $query->setFetchMode(PDO::FETCH_CLASS, $this->getEntityName());
-
-        return $query;
+        $this->databaseConnection = DatabaseConnection::getInstance();
+        $this->databaseConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
     }
 
     /**
@@ -30,7 +23,6 @@ abstract class Repository {
      * @return Entity
      */
     public function getById($id) {
-
         $query = $this->prepare("Select * from " . $this->getTableName() . " where id=:id");
 
         $query->execute(array(
@@ -59,19 +51,25 @@ abstract class Repository {
         return $result;
     }
 
+    protected abstract function getEntityName();
+
+    protected abstract function getTableName();
+
+    protected function prepare($statement) {
+        $query = $this->databaseConnection->prepare($statement);
+        $query->setFetchMode(PDO::FETCH_CLASS, $this->getEntityName());
+
+        return $query;
+    }
+
     /**
-     * @param Entity $object
+     * @param Entity $entity
      * @return null
      * @throws \ReflectionException
      */
-    private function performSave(Entity $object) {
-
-        //TODO remove all fields with null values
-        //TODO change method perform save to return updated entity object
-
-        $fields = ReflectionUtils::getObjectPrivateFields($object);
-
-        unset($fields['id']);
+    private function performSave(Entity $entity) {
+        $fields = ReflectionUtils::getObjectPrivateFields($entity);
+        $fields = self::removeNullValuesFromAssoc($fields);
 
         $fieldNamesString = implode(", ", array_keys($fields));
 
@@ -82,23 +80,23 @@ abstract class Repository {
         $stmt = $this->databaseConnection->prepare($sql);
 
         foreach ($fieldPlaceholders as $key => $value) {
-            $stmt->bindParam($fields, $value);
+            if (is_string($value)) {
+                $stmt->bindValue($key, $value, PDO::PARAM_STR);
+            } else {
+                $stmt->bindValue($key, $value);
+            }
         }
 
-        $stmt->execute();
+        try {
+            $stmt->execute();
+        } catch (\PDOException $e) {
+            //TODO save it to logfile.
+            return null;
+        }
 
-        return null;
+        return $this->getById($this->databaseConnection->lastInsertId());
     }
 
-    /**
-     * @param Entity $entity
-     * @return null
-     */
-    private function performUpdate(Entity $entity) {
-        return null;
-    }
-
-    //TODO move it to helper
     private static function addPrefixToArrayKeys($array, $prefix) {
         $resultArray = array();
 
@@ -109,7 +107,10 @@ abstract class Repository {
         return $resultArray;
     }
 
-    protected abstract function getEntityName();
+    private static function removeNullValuesFromAssoc($array) {
 
-    protected abstract function getTableName();
+        return array_filter($array, function ($value) {
+            return $value != null && $value != "";
+        });
+    }
 }

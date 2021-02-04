@@ -1,22 +1,20 @@
-<?php namespace App\Database;
+<?php
+
+
+namespace App\Database;
+
 
 use PDO;
 
-class Connector {
+class DatabaseConnection {
 
-    //TODO Consider to move it to configuration file.
+    private static $databaseConnection;
+
+    //TODO Consider to move it to configuration
     const DSN = "mysql:host=172.17.0.2;dbname=shop";
     const DATABASE_USERNAME = "root";
     const DATABASE_PASSWORD = "root";
 
-    private static $databaseConnection;
-
-    private function __construct() {
-    }
-
-    /**
-     * @return PDO
-     */
     public static function getInstance() {
 
         if (!self::$databaseConnection) {

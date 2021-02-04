@@ -1,13 +1,12 @@
-<?php namespace App\User\Entity;
+<?php
 
 
-use App\Database\Entity\Entity;
+namespace App\User\Model;
 
-class UserEntity extends Entity {
+class UserResponse {
 
     private $id;
     private $username;
-    private $password_hash;
     private $last_login;
     private $created_at;
 
@@ -16,6 +15,14 @@ class UserEntity extends Entity {
      */
     public function getId() {
         return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id) {
+        $this->id = $id;
+        return $this;
     }
 
     /**
@@ -30,21 +37,6 @@ class UserEntity extends Entity {
      */
     public function setUsername($username) {
         $this->username = $username;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPasswordHash() {
-        return $this->password_hash;
-    }
-
-    /**
-     * @param mixed $password_hash
-     */
-    public function setPasswordHash($password_hash) {
-        $this->password_hash = $password_hash;
         return $this;
     }
 

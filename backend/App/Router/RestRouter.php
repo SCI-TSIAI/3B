@@ -1,13 +1,15 @@
 <?php namespace App\Router;
 
-use App\Controller\UserController;
+use App\User\Controller\UserController;
 use App\Helpers\ReflectionUtils;
 use Bramus\Router\Router;
+use HaydenPierce\ClassFinder\ClassFinder;
 use ReflectionClass;
 use zpt\anno\Annotations;
 
 class RestRouter {
 
+    const MAIN_NAMESPACE = "App";
     const CONTROLLER_ANNOTATION_NAME = "Controller";
     const ACTION_ANNOTATION_NAME = "Action";
     const PATH_PARAMETER_NAME = "path";
@@ -27,7 +29,7 @@ class RestRouter {
                 header('Content-type: application/json');
             });
 
-            self::registerRoutes(UserController::class);
+            self::autoloadRoutes();;
 
             self::$router->run();
         }
@@ -69,7 +71,7 @@ class RestRouter {
 
         $actionMethod = strtoupper($methodAnnotations[self::ACTION_ANNOTATION_NAME][self::METHOD_PARAMETER_NAME]);
 
-        $actionPath = $methodAnnotations[self::PATH_PARAMETER_NAME];
+        $actionPath = $methodAnnotations[self::ACTION_ANNOTATION_NAME][self::PATH_PARAMETER_NAME];
 
         $path = !empty($actionPath) ? $controllerPath . $actionPath : $controllerPath;
 
@@ -88,6 +90,14 @@ class RestRouter {
                 break;
             default:
                 throw new \Exception("Unhandled action method!");
+        }
+    }
+
+    private static function autoloadRoutes() {
+        $classes = ClassFinder::getClassesInNamespace(self::MAIN_NAMESPACE, ClassFinder::RECURSIVE_MODE);
+
+        foreach ($classes as $class) {
+            self::registerRoutes($class);
         }
     }
 }
