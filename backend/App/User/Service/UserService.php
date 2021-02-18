@@ -47,6 +47,10 @@ class UserService {
         return $this->convertUserEntityToUserResponse($this->userRepository->getById($id));
     }
 
+    public function isUserWithPasswordExists($username, $password) {
+        return $this->userRepository->isUserWithPasswordExists($username, $password);
+    }
+
     /**
      * @param UserEntity $userEntity
      * @return UserResponse | bool
