@@ -39,6 +39,7 @@ class RestRouter {
      * @param $classname
      * @throws \ReflectionException
      * @throws \zpt\anno\ReflectorNotCommentedException
+     * @throws \Exception
      */
     private static function registerRoutes($classname) {
 
@@ -49,7 +50,13 @@ class RestRouter {
             return;
         }
 
-        $controllerPath = $classAnnotations[self::CONTROLLER_ANNOTATION_NAME][self::PATH_PARAMETER_NAME];
+        $controllerPath = isset($classAnnotations[self::CONTROLLER_ANNOTATION_NAME][self::PATH_PARAMETER_NAME])
+            ? $classAnnotations[self::CONTROLLER_ANNOTATION_NAME][self::PATH_PARAMETER_NAME]
+            : null;
+
+        if (empty($controllerPath)) {
+            throw new \Exception(sprintf("Path is empty in %s controller!", $classname));
+        }
 
         foreach ($classReflector->getMethods() as $methodReflector) {
             self::registerRoute($controllerPath, $methodReflector);
@@ -69,24 +76,36 @@ class RestRouter {
             return;
         }
 
-        $actionMethod = strtoupper($methodAnnotations[self::ACTION_ANNOTATION_NAME][self::METHOD_PARAMETER_NAME]);
+        $methodIdentifier = ReflectionUtils::getFullMethodIdentifier($methodReflector);
 
-        $actionPath = $methodAnnotations[self::ACTION_ANNOTATION_NAME][self::PATH_PARAMETER_NAME];
+        $actionMethod = isset($methodAnnotations[self::ACTION_ANNOTATION_NAME][self::METHOD_PARAMETER_NAME])
+            ? $methodAnnotations[self::ACTION_ANNOTATION_NAME][self::METHOD_PARAMETER_NAME]
+            : null;
+
+        if (empty($actionMethod)) {
+            throw new \Exception(sprintf("Method cannot be empty in action of %s method!", $methodIdentifier));
+        }
+
+        $actionMethod = strtoupper($actionMethod);
+
+        $actionPath = isset($methodAnnotations[self::ACTION_ANNOTATION_NAME][self::PATH_PARAMETER_NAME])
+            ? $methodAnnotations[self::ACTION_ANNOTATION_NAME][self::PATH_PARAMETER_NAME]
+            : null;
 
         $path = !empty($actionPath) ? $controllerPath . $actionPath : $controllerPath;
 
         switch ($actionMethod) {
             case "GET":
-                self::$router->get($path, ReflectionUtils::getFullMethodIdentifier($methodReflector));
+                self::$router->get($path, $methodIdentifier);
                 break;
             case "POST":
-                self::$router->post($path, ReflectionUtils::getFullMethodIdentifier($methodReflector));
+                self::$router->post($path, $methodIdentifier);
                 break;
             case "PUT":
-                self::$router->put($path, ReflectionUtils::getFullMethodIdentifier($methodReflector));
+                self::$router->put($path, $methodIdentifier);
                 break;
             case "DELETE":
-                self::$router->delete($path, ReflectionUtils::getFullMethodIdentifier($methodReflector));
+                self::$router->delete($path, $methodIdentifier);
                 break;
             default:
                 throw new \Exception("Unhandled action method!");
